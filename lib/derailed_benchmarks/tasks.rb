@@ -100,8 +100,10 @@ namespace :perf do
       raise "Add stackprof to your gemfile to continue `gem 'stackprof', group: :development`"
     end
     TEST_COUNT = (ENV["TEST_COUNT"] ||= "100").to_i
+    MODE = (ENV["MODE"] ||= 'cpu').to_sym
+    raise "Unknown stackprof mode: #{MODE}" unless [:wall, :cpu, :object].include?(MODE)
     file = "tmp/#{Time.now.iso8601}-stackprof-cpu-myapp.dump"
-    StackProf.run(mode: :cpu, out: file) do
+    StackProf.run(mode: MODE, out: file) do
       Rake::Task["perf:test"].invoke
     end
     cmd = "stackprof #{file}"
